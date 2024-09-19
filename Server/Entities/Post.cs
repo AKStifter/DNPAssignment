@@ -27,6 +27,6 @@ public class Post
     */
     public string ToString()
     {
-        return $"Id: {Id}, Title:{Title}, Body: {Body}, UserId: {UserId}";
+        return $"Id: {Id}, \nTitle:{Title}, \nBody: {Body}, \nUserId: {UserId}";
     }
 }
