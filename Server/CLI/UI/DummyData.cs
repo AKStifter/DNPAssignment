@@ -16,7 +16,7 @@ public class DummyData
         this.commentRepository = commentRepository;
     }
 
-    public void createDummyData()
+    public async void createDummyData()
     {
         User user1 = new User("TheFirst", "12345");
         User user2 = new User("TheRock", "RockAndRoll");
@@ -24,11 +24,11 @@ public class DummyData
         User user4 = new User("OutOfIdeas", "23242");
         User user5 = new User("RadiantRocket", "12345");
         
-        userRepository.AddAsync(user1);
-        userRepository.AddAsync(user2);
-        userRepository.AddAsync(user3);
-        userRepository.AddAsync(user4);
-        userRepository.AddAsync(user5);
+        await userRepository.AddAsync(user1);
+        await userRepository.AddAsync(user2);
+        await userRepository.AddAsync(user3);
+        await userRepository.AddAsync(user4);
+        await userRepository.AddAsync(user5);
 
         string title =
             "My Paladin broke his oath and now the entire party is calling me an unfair DM";
@@ -60,7 +60,7 @@ public class DummyData
 
 
         Post post1 = new Post(title, body, 1);
-        postRepository.AddAsync(post1);
+        await  postRepository.AddAsync(post1);
 
         title =
             "AITAH? I stopped wearing/using what my husband gave me after he said that it's his money";
@@ -82,7 +82,7 @@ public class DummyData
             "far.\n\nAm I the asshole for rejecting his gifts?";
         
         Post post2 = new Post(title, body, 1);
-        postRepository.AddAsync(post2);
+        await postRepository.AddAsync(post2);
 
         title = "Speedrunners: you are literally the worst and I hate you.";
         body =
@@ -95,16 +95,16 @@ public class DummyData
             "cosmetics.";
         
         Post post3 = new Post(title, body, 3);
-        postRepository.AddAsync(post3);
+        await postRepository.AddAsync(post3);
 
         Comment comment1 = new Comment(2, 1, "That guy is the worst");
         Comment comment2 = new Comment(5, 1, "Womp Womp");
         Comment comment3 = new Comment(3, 1, "“I shouldnt have to warn you that Torturing someone is literally evil.” Case closed. " +
                                              "If you are not an Evil alligned creature you cannot torture people and NO torture is NOT NEUTRAL." +
                                              " You cannot neutrally torture someone.");
-        commentRepository.AddAsync(comment1);
-        commentRepository.AddAsync(comment2);
-        commentRepository.AddAsync(comment3);
+        await commentRepository.AddAsync(comment1);
+        await commentRepository.AddAsync(comment2);
+        await commentRepository.AddAsync(comment3);
 
     }
 }
