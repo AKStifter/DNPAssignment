@@ -12,6 +12,12 @@ public class User
         Password = password;
     }
     
+    public User(int id, string name, string password)
+    {
+        Id = id;
+        Name = name;
+        Password = password;
+    }
     public string ToString()
     {
         return $"Id: {Id}, Name:{Name}, Password: {Password}";

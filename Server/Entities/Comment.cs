@@ -13,6 +13,14 @@ public class Comment
         PostId = postId;
         Body = body;
     }
+    
+    public Comment(int id, int userId, int postId, string body)
+    {
+        Id = Id;
+        UserId = userId;
+        PostId = postId;
+        Body = body;
+    }
 
     public string ToString()
     {

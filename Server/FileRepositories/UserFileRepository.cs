@@ -69,6 +69,8 @@ public class UserFileRepository : IUserRepository
             throw new InvalidOperationException($"User with ID '{id}' not found");
         }
         users.Remove(userToRemove);
+        usersAsJson = JsonSerializer.Serialize(users);
+        await File.WriteAllTextAsync(filePath, usersAsJson);
         return;
     }
 

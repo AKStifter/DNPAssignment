@@ -15,7 +15,15 @@ public class Post
         UserId = userId;
        // Comments = new List<Comment>();
     }
-
+    
+    public Post(int id, string title, string body, int userId)
+    {
+        Id = id;
+        Title = title;
+        Body = body;
+        UserId = userId;
+    }
+    
    /* public void AddComment(Comment comment)
     {
         Comments.Add(comment);
