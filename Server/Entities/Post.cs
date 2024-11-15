@@ -8,6 +8,10 @@ public class Post
     public int UserId { get; set; }
     //public List<Comment> Comments { get; set; }
 
+    public Post()
+    {
+    }
+
     public Post(string title, string body, int userId)
     {
         Title = title;

@@ -1,5 +1,6 @@
 using ApiContracts;
 using Entities;
+using FileRepositories;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryContracts;
 
@@ -31,7 +32,8 @@ public class UsersController : ControllerBase
                 Id = created.Id,
                 UserName = created.Name
             };
-            return Created($"/Users/{dto.Id}", created);
+            return Created("", dto);
+            //return Created($"/Users/{dto.Id}", created);
         }
         catch (Exception e)
         {

@@ -1,0 +1,42 @@
+@page "/CreatePost"
+@using ApiContracts
+@using ApiContracts.PostDtos
+@using BlazorApp.Components.Services
+@using Microsoft.AspNetCore.Mvc
+@inject IPostService postService
+<h3>CreatePost</h3>
+
+<input type="text" class="p-3" placeholder="Enter Tittle" @bind="Tittle"/>
+<textarea type="text" class="p-3" placeholder="Enter Body" @bind="Body"/>
+<button class="btn btn-primary" @onclick="AddPost">Create</button>
+<p>@message</p>
+
+@code {
+    private CreatePostDto? dto;
+    private PostDto? post;
+    private string? Tittle;
+    private string? Body;
+    private int userId = 1;
+    private string? message;
+    
+    private async Task AddPost()
+    {
+        try
+        {
+            dto = new()
+            {
+                Title = Tittle,
+                Body = Body,
+                UserId = userId
+            };
+            post = await postService.AddPost(dto);
+            message = "Post created";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            message = ex.Message;
+        }
+    }
+
+}

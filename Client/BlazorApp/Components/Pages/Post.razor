@@ -1,0 +1,99 @@
+@page "/posts/{postId:int}"
+@using ApiContracts.CommentDtos
+@using ApiContracts.PostDtos
+@using BlazorApp.Components.Services
+@using Entities
+@inject IPostService postService
+@inject Microsoft.AspNetCore.Components.NavigationManager navigationManager
+
+<PageTitle>Home</PageTitle>
+
+<div style="background: #41cbd3; border: #5c636a; border: solid; border-radius: 5px; margin-bottom: 5px">
+
+    <div class="item-Author">
+        <p> Written by: @post.UserName</p>
+    </div>
+    <div class="item-Author">
+        <h1> @post.Title</h1>
+    </div>
+    
+    <div class="item-Body">
+        <p>@post.Body</p>
+    </div>
+    
+</div>
+<div>
+    <div>Make a new comment</div>
+    <div>
+        <input type="text" class="p-3" placeholder="Enter name" @bind="Body"/>
+        <button class="btn btn-primary" @onclick="AddComment">Create</button>
+    </div>
+</div>
+<div class="items-grid">
+    <h1>Comments</h1>
+    @foreach (Comment comment in post.Comments)
+    {
+        <div style="background: #41cbd3; border: #5c636a; border: solid; border-radius: 5px; margin-bottom: 5px">
+
+            <div class="item-Body">
+                <p>@comment.Body</p>
+            </div>
+
+            <div class="item-Author">
+                <p>Written by user: @comment.UserId</p>
+            </div>
+        </div>
+    }
+</div>
+@code {
+
+    private string Body;
+    private GetPostDto post = new GetPostDto()
+    {
+        Id = 1,
+        Body = "2",
+        Title = "T",
+        UserId = 1,
+        UserName = "N",
+        Comments = new List<Comment>([])
+
+    };
+
+    private CreateCommentDto commentDto;
+    [Parameter]
+    public int postId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+    
+        try
+        {
+            post = await postService.GetSinglePost(postId);
+   
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    
+    }
+    private async Task AddComment()
+    {
+        try
+        {
+            commentDto = new()
+            {
+                Body = Body,
+                PostId = postId,
+                UserId = 2,
+            };
+            await postService.AddComment(postId, commentDto);
+            navigationManager.Refresh(true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+}

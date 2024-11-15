@@ -86,7 +86,12 @@ public class PostsController : ControllerBase
             Post post = await postRepo.GetSingleAsync(id);
             User user = await userRepo.GetSingleAsync(post.UserId);
             IQueryable<Comment> comments =  commentRepo.GetMany();
-            comments = comments.Where(c => c.UserId== user.Id);
+            List<Comment> lComments = new List<Comment>();
+            comments = comments.Where(c => c.PostId == post.Id);
+            foreach (Comment c in comments)
+            {
+                lComments.Add(c);
+            }
             GetPostDto dto = new()
             {
                 Id = post.Id,
@@ -94,7 +99,7 @@ public class PostsController : ControllerBase
                 Body = post.Body,
                 UserId = post.UserId,
                 UserName = user.Name,
-                Comments = comments
+                Comments = lComments
             };
             return Ok(dto);
         }
@@ -111,7 +116,9 @@ public class PostsController : ControllerBase
     {
         try
         {
-            IQueryable<Post> posts = postRepo.GetMany(); 
+            IQueryable<Post> posts = postRepo.GetMany();
+            List<ManyPostDto> dtos = new List<ManyPostDto>();
+
         
             if (!string.IsNullOrEmpty(nameContains))
             {
@@ -121,7 +128,19 @@ public class PostsController : ControllerBase
             {
                 posts = posts.Where(u => u.UserId.Equals(userId));
             }
-            return Results.Ok(posts);
+
+            Console.WriteLine(posts);
+            foreach (Post post in posts)
+            {
+                ManyPostDto dto = new()
+                {
+                    Id = post.Id,
+                    Title = post.Title,
+                    UserName = userRepo.GetSingleAsync(post.UserId).Result.Name,
+                };
+                dtos.Add(dto);
+            }
+            return Results.Ok(dtos);
 
         }
         catch (Exception e)
@@ -147,7 +166,7 @@ public class PostsController : ControllerBase
     }
     
     [HttpPost("{postId}/comments")]
-    public async Task<ActionResult<CommentDto>> AddComment([FromQuery] int postId,
+    public async Task<ActionResult<CommentDto>> AddComment([FromRoute] int postId,
         [FromBody] CreateCommentDto request)
     {
         try

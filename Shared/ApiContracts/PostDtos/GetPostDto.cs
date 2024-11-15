@@ -9,5 +9,5 @@ public class GetPostDto
     public required string Body { get; set; }
     public required int UserId { get; set; }
     public required string UserName { get; set; }
-    public required IQueryable<Comment> Comments { get; set; }
+    public required List<Comment>  Comments { get; set; }
 }

@@ -24,7 +24,7 @@ public class CommentsController : ControllerBase
     
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<PostDto>> UpdateComment([FromRoute] int id,
+    public async Task<ActionResult<CommentDto>> UpdateComment([FromRoute] int id,
         [FromBody] UpdateCommentReq commentResponseInfo)
     {
         try

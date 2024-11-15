@@ -1,0 +1,53 @@
+@page "/browse"
+@using System.Collections
+@using ApiContracts.PostDtos
+@using BlazorApp.Components.Services
+@inject IPostService postService
+@inject Microsoft.AspNetCore.Components.NavigationManager navigationManager
+
+<PageTitle>Home</PageTitle>
+
+<h1>Welcome to NotReddit!</h1>
+
+Here you can see the newest user posts.
+
+<div class="items-grid">
+    @foreach (ManyPostDto post in posts)
+    {
+        <div style="background: #41cbd3; border: #5c636a; border: solid; border-radius: 5px; margin-bottom: 5px">
+            <div class="item-Author">
+                <p>Author: @post.UserName</p>
+            </div>
+
+            <div class="item-name">
+                <a  @onclick="()=> onTitleClick(post.Id)">@post.Title</a>
+            </div>
+        </div>
+    }
+</div>
+@code {
+    private IEnumerable<ManyPostDto> posts = new List<ManyPostDto>();
+    
+    protected override async Task OnInitializedAsync()
+    {
+    
+        try
+        { 
+            posts = await postService.GetMany(null, null);
+       
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    
+    }
+
+    private void onTitleClick(int id)
+    {
+  
+        navigationManager.NavigateTo($"posts/{id}");
+    }
+    
+
+}

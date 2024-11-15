@@ -1,0 +1,39 @@
+@page "/CreateUser"
+@using ApiContracts
+@using BlazorApp.Components.Services
+@inject IUserService userService
+<h3>CreateUser</h3>
+
+<input type="text" class="p-3" placeholder="Enter name" @bind="userName"/>
+<input type="text" class="p-3" placeholder="Enter password" @bind="userPassword"/>
+<button class="btn btn-primary" @onclick="AddUser">Create</button>
+<p>@message</p>
+
+
+@code {
+    private CreateUserDto? dto;
+    private UserDto? user;
+    private string? userName;
+    private string? userPassword;
+    private string? message;
+    
+    private async Task AddUser()
+    {
+        try
+        {
+            dto = new()
+            {
+                UserName = userName,
+                Password = userPassword
+            };
+            user = await userService.AddUserAsync(dto);
+            message = "User created";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            message = ex.Message;
+        }
+    }
+
+}
