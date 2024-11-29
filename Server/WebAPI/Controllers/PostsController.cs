@@ -3,6 +3,7 @@ using ApiContracts.CommentDtos;
 using ApiContracts.PostDtos;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace WebAPI.Controllers;
@@ -83,14 +84,32 @@ public class PostsController : ControllerBase
     {
         try
         {
+            //When trying to get the data with a single query I get the following error
+            //Translating this query requires the SQL APPLY operation, which is not supported on SQLite.
+            /*IQueryable<Post> queryForPost =
+                postRepo.GetMany().Where(p => p.Id == id).AsQueryable();
+            queryForPost = queryForPost.Include(p => p.User);
+            queryForPost = queryForPost.Include(p => p.Comments);*/
             Post post = await postRepo.GetSingleAsync(id);
             User user = await userRepo.GetSingleAsync(post.UserId);
             IQueryable<Comment> comments =  commentRepo.GetMany();
             List<Comment> lComments = new List<Comment>();
+            List<CommentDto> commentDtos = new List<CommentDto>();
             comments = comments.Where(c => c.PostId == post.Id);
+            
             foreach (Comment c in comments)
             {
-                lComments.Add(c);
+                User commenter = await userRepo.GetSingleAsync(c.UserId);
+                CommentDto commentDto = new()
+                {
+                    
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    Body = c.Body,
+                    PostId = c.PostId,
+                    UserName = commenter.Name
+                };   
+                commentDtos.Add(commentDto);
             }
             GetPostDto dto = new()
             {
@@ -99,9 +118,26 @@ public class PostsController : ControllerBase
                 Body = post.Body,
                 UserId = post.UserId,
                 UserName = user.Name,
-                Comments = lComments
+                Comments = commentDtos
             };
-            return Ok(dto);
+           /*GetPostDto? dto = await queryForPost.Select(post => new GetPostDto()
+           {
+               Id = post.Id,
+               Title = post.Title,
+               Body = post.Body,
+               UserId = post.UserId,
+               UserName = post.User.Name,
+               Comments = post.Comments.Select(c => new CommentDto
+               {
+                   Id = c.Id,
+                   UserId = c.UserId,
+                   Body = c.Body,
+                   PostId = post.Id,
+                   UserName = c.User.Name,
+               }).ToList() 
+           }) .FirstOrDefaultAsync();*/
+           
+           return dto == null ? NotFound() : Ok(dto);
         }
         catch (Exception e)
         {
@@ -112,24 +148,42 @@ public class PostsController : ControllerBase
     
     [HttpGet]
     public async Task<IResult> GetMany(
-        [FromQuery] string? nameContains, [FromQuery] int? userId)
+        [FromQuery] string? nameContains = null, [FromQuery] int? userId = null)
     {
         try
         {
-            IQueryable<Post> posts = postRepo.GetMany();
+            IQueryable<Post> queryForPosts = postRepo.GetMany().Where(p =>
+                nameContains == null ||
+                p.Title.ToLower().Contains(nameContains.ToLower()) &&
+                userId == null || p.UserId.Equals(userId)).AsQueryable();
+            
+            queryForPosts.Include(p => p.User);
+            
+            List<ManyPostDto>? dtos = await queryForPosts.Select(post =>
+                new ManyPostDto()
+                {
+                    Id = post.Id,
+                    Title = post.Title,
+                    UserName = post.User.Name,
+                }).ToListAsync();
+            /*IList<Post> posts = await postRepo.GetMany().Where(p =>
+                    nameContains == null ||
+                    p.Title.ToLower().Contains(nameContains.ToLower()) && userId == null || p.UserId.Equals(userId))
+                .ToListAsync();
+            //IQueryable<Post> posts = postRepo.GetMany();
             List<ManyPostDto> dtos = new List<ManyPostDto>();
 
         
-            if (!string.IsNullOrEmpty(nameContains))
+           /* if (!string.IsNullOrEmpty(nameContains))
             {
                 posts = posts.Where(u => u.Title.ToLower().Contains(nameContains.ToLower()));
             }
             if (!string.IsNullOrEmpty(userId.ToString()))
             {
                 posts = posts.Where(u => u.UserId.Equals(userId));
-            }
+            }*/
 
-            Console.WriteLine(posts);
+            /*Console.WriteLine(posts);
             foreach (Post post in posts)
             {
                 ManyPostDto dto = new()
@@ -139,7 +193,7 @@ public class PostsController : ControllerBase
                     UserName = userRepo.GetSingleAsync(post.UserId).Result.Name,
                 };
                 dtos.Add(dto);
-            }
+            }*/
             return Results.Ok(dtos);
 
         }
@@ -183,7 +237,7 @@ public class PostsController : ControllerBase
                 UserName = user.Name
                 
             };
-            return Created($"/Posts/{dto.PostId}/Comments", created);
+            return Created($"/Posts/{dto.PostId}/Comments", dto);
         }
         catch (Exception e)
         {

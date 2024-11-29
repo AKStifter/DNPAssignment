@@ -16,7 +16,7 @@ public class AuthController : ControllerBase
         this.userRepo = userRepo;
     }
     
-    [HttpPost]
+    [HttpPost("login")]
     public async Task<ActionResult<UserDto>> CheckUser(
         [FromBody] CreateUserDto request)
     {

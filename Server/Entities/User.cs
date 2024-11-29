@@ -1,12 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Entities;
 
 public class User
 {
+    [Key]
     public int Id { get; set; }
     public string Name { get; set; }
     public string Password { get; set; }
-
-    public User()
+    public List<Post> Posts { get; set; } = [];
+    public List<Comment> Comments { get; set; } = [];
+    private User()
     {
     }
 

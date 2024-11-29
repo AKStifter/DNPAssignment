@@ -2,6 +2,7 @@ using ApiContracts;
 using Entities;
 using FileRepositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace WebAPI.Controllers;
@@ -85,16 +86,20 @@ public class UsersController : ControllerBase
     
     [HttpGet]
     public async Task<IResult> GetMany(
-        [FromQuery] string? nameContains)
+        [FromQuery] string? nameContains = null)
     {
         try
         {
-            IQueryable<User> users = userRepo.GetMany(); 
+            IList<User> users = await userRepo.GetMany().Where(u =>
+                    nameContains == null ||
+                    u.Name.ToLower().Contains(nameContains.ToLower()))
+                .ToListAsync();
+           /* IQueryable<User> users = userRepo.GetMany(); 
         
             if (!string.IsNullOrEmpty(nameContains))
             {
                 users = users.Where(u => u.Name.ToLower().Contains(nameContains.ToLower()));
-            }
+            }*/
             return Results.Ok(users);
 
         }
